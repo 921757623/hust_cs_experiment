@@ -1,0 +1,101 @@
+import java.sql.*;
+
+public class Transform {
+  static final String JDBC_DRIVER = "org.postgresql.Driver";
+  static final String DB_URL = "jdbc:postgresql://127.0.0.1:5432/postgres?";
+  static final String USER = "gaussdb";
+  static final String PASS = "Passwd123@123";
+    
+  /**
+    * 向sc表中插入数据
+    *
+    */
+  public static int insertSC(Connection connection, int sno, String subject, int socre){
+    Statement statement = null;
+    try{
+      statement = connection.createStatement();
+      String SQL = "insert into sc(sno, col_name, col_value) values (" + String.valueOf(sno) + ", '" + subject + "', '" + String.valueOf(socre) + "');";
+      return statement.executeUpdate(SQL);
+    }catch (SQLException e) {
+      throw new RuntimeException(e);
+    }finally {
+      try {
+        if (statement != null) {
+          statement.close();
+        }
+      } catch (SQLException throwables) {
+        throwables.printStackTrace();
+      }
+    }
+  }
+
+  public static void main(String[] args) {
+    Connection connection = null;
+    Statement statement = null;
+    ResultSet resultSet = null;
+    try {
+      Class.forName(JDBC_DRIVER);
+      connection = DriverManager.getConnection(DB_URL, USER, PASS);
+      statement = connection.createStatement();
+      String SQL = "select * from entrance_exam;";
+      resultSet = statement.executeQuery(SQL);
+      while(resultSet.next()) {
+        int sno = resultSet.getInt("sno");
+				int chinese = resultSet.getInt("chinese");
+				int math = resultSet.getInt("math");
+				int english = resultSet.getInt("english");
+				int physics = resultSet.getInt("physics");
+				int chemistry = resultSet.getInt("chemistry");
+				int biology = resultSet.getInt("biology");
+				int history = resultSet.getInt("history");
+				int geography = resultSet.getInt("geography");
+				int politics = resultSet.getInt("politics");
+				if(chinese != 0) {
+					insertSC(connection, sno, "chinese", chinese);
+				}
+				if(math != 0) {
+					insertSC(connection, sno, "math", math);
+				}
+				if(english != 0) {
+					insertSC(connection, sno, "english", english);
+				}
+				if(physics != 0){
+					insertSC(connection, sno, "physics", physics);
+				}
+				if(chemistry != 0){
+					insertSC(connection, sno, "chemistry", chemistry);
+				}
+				if(biology != 0){
+					insertSC(connection, sno, "biology", biology);
+				}
+				if(history != 0){
+					insertSC(connection, sno, "history", history);
+				}
+				if(geography != 0){
+					insertSC(connection, sno, "geography", geography);
+				}
+				if(politics != 0){
+					insertSC(connection, sno, "politics", politics);
+				}
+      }
+    } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+    } catch (SQLException throwables) {
+          throwables.printStackTrace();
+    } finally {
+      try {
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (statement != null) {
+            statement.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+      } catch (SQLException throwables) {
+        throwables.printStackTrace();
+      }
+    }
+  }
+}

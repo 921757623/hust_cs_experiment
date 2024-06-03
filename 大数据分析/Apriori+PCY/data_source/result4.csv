@@ -1,0 +1,13 @@
+tuple, count, support
+{'whole milk', 'yogurt', 'other vegetables', 'root vegetables'}, 77, 0.007829181494661922
+{'whole milk', 'yogurt', 'other vegetables', 'tropical fruit'}, 75, 0.007625826131164209
+{'whole milk', 'other vegetables', 'tropical fruit', 'root vegetables'}, 69, 0.007015760040671073
+{'whole milk', 'rolls/buns', 'root vegetables', 'other vegetables'}, 61, 0.0062023385866802234
+{'whole milk', 'yogurt', 'rolls/buns', 'other vegetables'}, 59, 0.005998983223182512
+{'whole milk', 'other vegetables', 'citrus fruit', 'root vegetables'}, 57, 0.005795627859684799
+{'whole milk', 'yogurt', 'tropical fruit', 'root vegetables'}, 56, 0.0056939501779359435
+{'whole milk', 'whipped/sour cream', 'yogurt', 'other vegetables'}, 55, 0.005592272496187087
+{'whole milk', 'other vegetables', 'root vegetables', 'pip fruit'}, 54, 0.005490594814438231
+{'whole milk', 'whipped/sour cream', 'other vegetables', 'root vegetables'}, 51, 0.005185561769191663
+{'whole milk', 'fruit/vegetable juice', 'yogurt', 'other vegetables'}, 50, 0.005083884087442806
+{'whole milk', 'yogurt', 'other vegetables', 'pip fruit'}, 50, 0.005083884087442806

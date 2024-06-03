@@ -1,0 +1,76 @@
+
+-- 编写一存储过程，自动安排某个连续期间的大夜班的值班表:
+
+create procedure sp_night_shift_arrange(in start_date date, in end_date date)
+AS 
+declare now_date date := start_date;
+
+declare doc_name char(30); 
+declare doc_type int := 0;
+
+declare nur_name1 char(30);
+declare nur_name2 char(30);
+
+declare is_delay boolean := false;
+declare delay_name char(30);
+
+cursor doc_cursor for select e_name, e_type from employee where e_type <> 3;
+cursor nur_cursor for select e_name from employee where e_type = 3;
+begin
+    open doc_cursor;
+    open nur_cursor;
+
+    fetch nur_cursor into nur_name1;
+    fetch nur_cursor into nur_name2;
+    
+    while now_date <= end_date loop
+        if extract(DOW FROM cast(now_date as TIMESTAMP)) = 1 
+        and is_delay = true then
+            doc_name := delay_name;
+            is_delay := false;
+        else
+            fetch doc_cursor into doc_name, doc_type;
+            if doc_cursor % notfound then
+                close doc_cursor;
+                open doc_cursor;
+                fetch doc_cursor into doc_name, doc_type;
+            end if;
+
+            if doc_type = 1
+            and (extract(DOW FROM cast(now_date as TIMESTAMP)) = 6
+            or extract(DOW FROM cast(now_date as TIMESTAMP)) = 0) then
+                is_delay := true;
+                delay_name := doc_name;
+
+                fetch doc_cursor into doc_name, doc_type;
+                if doc_cursor % notfound then
+                    close doc_cursor;
+                    open doc_cursor;
+                    fetch doc_cursor into doc_name, doc_type;
+                end if;
+            end if;
+        end if;
+
+        insert into night_shift_schedule 
+        values (now_date, doc_name, nur_name1, nur_name2);
+
+        fetch nur_cursor into nur_name1;
+        if nur_cursor % notfound then
+            close nur_cursor;
+            open nur_cursor;
+            fetch nur_cursor into nur_name1;
+        end if;
+        fetch nur_cursor into nur_name2;
+        if nur_cursor % notfound then
+            close nur_cursor;
+            open nur_cursor;
+            fetch nur_cursor into nur_name2;
+        end if;
+
+        
+        
+        now_date := now_date + 1;
+    end loop;
+end;
+
+/*  end  of  your code  */ 

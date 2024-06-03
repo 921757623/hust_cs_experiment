@@ -1,0 +1,25 @@
+       -- 25) 查找相似的理财客户
+--   请用一条SQL语句实现该查询：
+select * 
+from (
+       select a.pro_c_id as pac, b.pro_c_id as pbc, count(*) as common, rank() over(partition by pac order by common desc,pbc) as crank
+       from (
+              select pro_c_id, pro_pif_id
+              from property 
+              where pro_type = 1
+       )a, (
+              select pro_c_id, pro_pif_id
+              from property 
+              where pro_type = 1
+       )b
+       where a.pro_c_id <> b.pro_c_id and a.pro_pif_id = b.pro_pif_id
+       group by a.pro_c_id, b.pro_c_id
+)
+where crank < 3;
+
+
+
+
+
+
+--/*  end  of  your code  */

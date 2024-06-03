@@ -1,0 +1,82 @@
+ fun printInt (a:int) =
+    print(Int.toString(a)^" ");
+
+fun getInt () =
+    Option.valOf (TextIO.scanStream (Int.scan StringCvt.DEC) TextIO.stdIn);
+    
+fun printIntList ( [] ) = ()
+  | printIntList ( x::xs ) = 
+    let
+	val tmp = printInt(x)
+    in
+	printIntList(xs)
+    end;
+
+fun getIntList ( 0 ) = []
+  | getIntList ( N:int) = getInt()::getIntList(N-1);
+
+fun split [ ]  = ([ ], [ ]) 
+    | split [x] = ([ ], [x])
+    | split (x::y::L) =
+	let val (A, B) =split L
+	in (x::A, y::B) 	
+	end;
+
+datatype tree = Empty | Br of tree * int * tree; 
+
+fun trav(Br(t1,a,t2)) = trav(t1)@(a::trav(t2))
+    |trav empty = [];
+
+fun postorderTraversal (Empty) = []
+  | postorderTraversal (Br (left, value, right)) =
+    postorderTraversal left @ postorderTraversal right @ [value];
+
+fun listToTree ([] : int list) : tree = Empty
+  | listToTree (x::l) = let val (l1, l2) = split l
+    	in Br(listToTree l1, x, listToTree l2)
+  end;
+
+
+(*begin*)
+fun treecompare (Empty : tree, Empty : tree) : order = EQUAL
+  | treecompare (Empty : tree, Br (_, x, _)) = LESS
+  | treecompare (Br (_, x, _), Empty : tree) = GREATER
+  | treecompare (Br (_, x, _), Br (_, y, _)) = Int.compare(x, y);
+
+fun SwapDown (Empty : tree) : tree = Empty
+  | SwapDown (Br (left, x, right)) = 
+    case (left, right) of
+      (Empty, Empty) => Br (Empty, x, Empty)
+    | (Br (left_left, leftx, left_right), Empty) =>
+      if Int.compare(x, leftx) = GREATER then
+        Br (SwapDown (Br (left_left, x, left_right)), leftx, Empty)
+      else
+        Br (left, x, Empty)
+    | (Empty, Br (right_left, rightx, right_right)) =>
+      if Int.compare(x, rightx) = GREATER then
+        Br (Empty, rightx, SwapDown (Br (right_left, x, right_right)))
+      else
+        Br (Empty, x, right)
+    | (Br (left_left, leftx, left_right), Br (right_left, rightx, right_right)) =>
+      if Int.compare(leftx, x) = GREATER andalso Int.compare(rightx, x) = GREATER then
+        Br (left, x, right)
+      else if Int.compare(leftx, x) = LESS andalso Int.compare(x, rightx) = LESS then
+        Br (SwapDown (Br (left_left, x, left_right)), leftx, right)
+      else if Int.compare(rightx, x) = LESS andalso Int.compare(x, leftx) = LESS then
+        Br (left, rightx, SwapDown (Br (right_left, x, right_right)))
+      else if treecompare(left, right) = LESS andalso Int.compare(rightx, x) = LESS then
+        Br (SwapDown (Br (left_left, x, left_right)), leftx, right)
+      else if treecompare(right, left) = LESS andalso Int.compare(leftx, x) = LESS then
+        Br (left, rightx, SwapDown (Br (right_left, x, right_right)))
+      else
+        Empty;
+
+fun heapify (Empty : tree) : tree = Empty
+  | heapify (Br (left, x, right)) = SwapDown (Br (heapify left, x, heapify right));
+(*end*)
+
+val L = getIntList(7);
+printIntList (trav(heapify(listToTree L)));
+print("\n");
+printIntList (postorderTraversal(heapify(listToTree L)));
+

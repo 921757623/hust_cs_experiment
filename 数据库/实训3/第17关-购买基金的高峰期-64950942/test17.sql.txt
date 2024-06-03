@@ -1,0 +1,22 @@
+with daily as (
+    select pro_purchase_time, amount, i, 
+    coalesce(lead(i, 1) over (order by pro_purchase_time), -1) as next, 
+    coalesce(lead(i, 2) over (order by pro_purchase_time), -1) as next_next,
+    coalesce(lag(i, 1) over (order by pro_purchase_time), -2) as pri,
+    coalesce(lag(i, 2) over (order by pro_purchase_time), -3) as pri_pri
+    from (
+    select pro_purchase_time, sum(pro_quantity * f_amount) as amount, (rank() over (order by pro_purchase_time)) as i
+        from property 
+        join fund
+        on pro_pif_id = f_id and pro_type = 3
+        where pro_purchase_time between '2022-02-07' and '2022-02-28' and extract(dow from cast(pro_purchase_time as timestamp)) in (1, 2, 3, 4, 5) 
+        group by pro_purchase_time
+        order by pro_purchase_time
+    )
+    where amount >= 1000000
+)
+select pro_purchase_time, amount
+from daily
+where (next = i + 1 and next_next = i + 2) 
+or (next = i + 1 and pri = i- 1)
+or (pri = i - 1 and pri_pri = i - 2)

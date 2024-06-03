@@ -1,0 +1,47 @@
+fun printInt (a:int) =
+    print(Int.toString(a)^" ");
+
+fun getInt () =
+    Option.valOf (TextIO.scanStream (Int.scan StringCvt.DEC) TextIO.stdIn);
+    
+fun printIntList ( [] ) = ()
+  | printIntList ( x::xs ) = 
+    let
+	val tmp = printInt(x)
+    in
+	printIntList(xs)
+    end;
+
+fun getIntList ( 0 ) = []
+  | getIntList ( N:int) = getInt()::getIntList(N-1);
+
+(*  完成Begin和End间代码 *)    
+(*****Begin*****)
+fun PrefixSum lst = 
+    let
+        fun presum ([], res) = res
+            | presum (x :: xs, res) = 
+                let 
+                    fun sum0 ([]) = 0
+                        | sum0 (y :: ys) = y + sum0(ys);
+                in 
+                    presum(xs,(x + sum0(xs)) ::res  )
+                end;
+            ;
+    in
+        presum (List.rev(lst), [])
+    end;
+
+fun fastPrefixSum lst = 
+    let
+        fun fast (res, _, []) = res
+            | fast (res, ss, x :: xs) = fast (res @ [x + ss], x + ss, xs);
+    in
+        fast ([], 0, lst)
+    end;
+(*****End*****)
+
+
+val L = getIntList(3);
+printIntList (PrefixSum L);
+printIntList (fastPrefixSum L);
